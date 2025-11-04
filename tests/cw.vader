@@ -262,18 +262,33 @@ Then (Assert that cursor is at z):
 Expect ("b c\nd e" changed to z):
   a z f
 
+Given (Snake case word):
+  foo_bar
+
+Execute (cw on underscore):
+  normal lllcw
+  AssertEqual 3, col('.')
+
+Expect (Only underscore deleted):
+  foobar
+
 Given (Leading spaces):
       foo
+      bar
 
-Execute (FIXME: cw):
-  normal cw
+Execute (cw):
+  normal jcw
   AssertEqual 1, col('.')
 
 Expect (Leading spaces deleted):
-  foo
+      foo
+  bar
 
-Execute (reference cw):
-  normal! cw
+Given (Leading spaces with only 1 line):
+      foo
+
+Execute (cw at the first line and col of the file):
+  normal cw
   AssertEqual 1, col('.')
 
 Expect (Leading spaces deleted):

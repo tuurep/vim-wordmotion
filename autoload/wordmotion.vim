@@ -87,10 +87,14 @@ function wordmotion#motion(count, mode, flags, uppercase, extra, ...)
 	set cpoptions+=c
 
 	let l:flags = a:flags
+	let l:s = a:uppercase ? s:us : s:s
 
+	" cw special case (see :help cw)
 	if a:mode == 'o' && v:operator == 'c' && l:flags == ''
-		" special case (see :help cw)
-		let l:flags = 'e'
+		let l:cursor_on_s = matchstr(getline('.'), '\%' . col('.') . 'c' . l:s) != ''
+		if !l:cursor_on_s
+			let l:flags = 'e'
+		endif
 		let l:cw = 1
 	else
 		let l:cw = 0
@@ -114,7 +118,7 @@ function wordmotion#motion(count, mode, flags, uppercase, extra, ...)
 	let l:pos = getpos('.')
 
 	let l:count = a:count
-	if l:cw
+	if l:cw && !l:cursor_on_s
 		" cw on the last character of a word will match the cursor position
 		call search('\m'.l:pattern, l:flags.'cW')
 		let l:count -= 1
@@ -124,19 +128,17 @@ function wordmotion#motion(count, mode, flags, uppercase, extra, ...)
 		let l:count -= 1
 	endwhile
 
-	" dw at the end of a line should not consume the newline or leading white
-	" space on the next line
-	let l:is_dw = a:mode == 'o' && v:operator == 'd' && l:flags == ''
+	" operator-pending w at the end of a line should not include the newline or leading
+	" white space on the next line
 	let l:next_line = l:pos[1] < getpos('.')[1]
-	if l:is_dw && l:next_line
-		let l:s = a:uppercase ? s:us : s:s
+	if a:mode == 'o' && l:flags == '' && l:next_line
 		" newline, leading whitespace, cursor
 		if search('\m\n\%('.l:s.'\)*\%#', 'bW') != 0
-			let l:dwpos = getpos('.')
+			let l:wpos = getpos('.')
 			" need to make range inclusive
 			call setpos('.', l:pos)
 			normal! v
-			call setpos('.', l:dwpos)
+			call setpos('.', l:wpos)
 		endif
 	endif
 
