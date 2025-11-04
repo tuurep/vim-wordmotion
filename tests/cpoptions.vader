@@ -28,6 +28,17 @@ Execute (w with cpo-<):
   normal w
   AssertEqual 5, col('.')
 
+Execute (cw without cpo-z):
+  if has('nvim')
+    set cpoptions-=_
+  else
+    set cpoptions-=z
+  endif
+  normal cw
+
+Expect (Delete the space):
+  bar
+
 Given (Leading spaces):
       foo
 

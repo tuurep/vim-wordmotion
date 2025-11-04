@@ -90,7 +90,9 @@ function wordmotion#motion(count, mode, flags, uppercase, extra, ...)
 	let l:s = a:uppercase ? s:us : s:s
 
 	" cw special case (see :help cw)
-	if a:mode == 'o' && v:operator == 'c' && l:flags == ''
+	let l:cpo_z = has('nvim') ? stridx(l:cpo, '_') : stridx(l:cpo, 'z')
+
+	if l:cpo_z != -1 && a:mode == 'o' && v:operator == 'c' && l:flags == ''
 		let l:cursor_on_s = matchstr(getline('.'), '\%' . col('.') . 'c' . l:s) != ''
 		if !l:cursor_on_s
 			let l:flags = 'e'
