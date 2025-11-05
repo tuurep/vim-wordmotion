@@ -89,17 +89,17 @@ function wordmotion#motion(count, mode, flags, uppercase, extra, ...)
 	let l:flags = a:flags
 	let l:s = a:uppercase ? s:us : s:s
 
-	" cw special case (see :help cw)
+	" cw special case
+	" see :help cw, :help cpo-z (vim), :help cpo-_ (neovim)
 	let l:cpo_z = has('nvim') ? stridx(l:cpo, '_') : stridx(l:cpo, 'z')
+	let l:cw_special_case = 0
 
 	if l:cpo_z != -1 && a:mode == 'o' && v:operator == 'c' && l:flags == ''
 		let l:cursor_on_s = matchstr(getline('.'), '\%' . col('.') . 'c' . l:s) != ''
 		if !l:cursor_on_s
 			let l:flags = 'e'
+			let l:cw_special_case = 1
 		endif
-		let l:cw = 1
-	else
-		let l:cw = 0
 	endif
 
 	if a:mode == 'x'
@@ -120,7 +120,7 @@ function wordmotion#motion(count, mode, flags, uppercase, extra, ...)
 	let l:pos = getpos('.')
 
 	let l:count = a:count
-	if l:cw && !l:cursor_on_s
+	if l:cw_special_case
 		" cw on the last character of a word will match the cursor position
 		call search('\m'.l:pattern, l:flags.'cW')
 		let l:count -= 1
