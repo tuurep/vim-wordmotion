@@ -95,7 +95,7 @@ function wordmotion#motion(count, mode, flags, uppercase, extra, ...)
 	let l:cw_special_case = 0
 
 	if l:cpo_z != -1 && a:mode == 'o' && v:operator == 'c' && l:flags == ''
-		let l:cursor_on_s = matchstr(getline('.'), '\%' . col('.') . 'c' . l:s) != ''
+		let l:cursor_on_s = getline('.') =~# '\%.c' . l:s
 		if !l:cursor_on_s
 			let l:flags = 'e'
 			let l:cw_special_case = 1
